@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+void registerUser() {
+    char username[MAX], password[MAX];
+    FILE *fp = fopen("users.txt", "a");
+
+    if (fp == NULL) {
+        printf("Cannot open file.\n");
+        return;
+    }
+
+    printf("Enter username: ");
+    scanf("%s", username);
+    printf("Enter password: ");
+    scanf("%s", password);
+
+    fprintf(fp, "%s %s\n", username, password);
+    fclose(fp);
+
+    printf("Registration successful!\n");
+}
+
+int loginUser() {
+    char username[MAX], password[MAX];
+    char fileUser[MAX], filePass[MAX];
+    int found = 0;
+
+    printf("Enter username: ");
+    scanf("%s", username);
+    printf("Enter password: ");
+    scanf("%s", password);
+
+    FILE *fp = fopen("users.txt", "r");
+    if (fp == NULL) {
+        printf("Cannot open file.\n");
+        return 0;
+    }
+
+    while (fscanf(fp, "%s %s", fileUser, filePass) != EOF) {
+        if (strcmp(username, fileUser) == 0 && strcmp(password, filePass) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if (found) {
+        printf("Login successful!\n");
+        return 1;
+    } else {
+        printf("Invalid username or password.\n");
+        return 0;
+    }
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\n==== MENU ====\n");
+        printf("1. Register\n");
+        printf("2. Login\n");
+        printf("3. Exit\n");
+        printf("Choose: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                registerUser();
+                break;
+            case 2:
+                loginUser();
+                break;
+            case 3:
+                printf("Goodbye!\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 3);
+
+    return 0;
+}
