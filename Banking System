@@ -1,0 +1,142 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Account {
+    int accountNumber;
+    char name[100];
+    float balance;
+};
+
+void createAccount(FILE *fp) {
+    struct Account acc;
+    printf("Enter account number: ");
+    scanf("%d", &acc.accountNumber);
+    printf("Enter name: ");
+    scanf(" %[^\n]", acc.name);
+    printf("Enter initial balance: ");
+    scanf("%f", &acc.balance);
+
+    fseek(fp, 0, SEEK_END);
+    fwrite(&acc, sizeof(acc), 1, fp);
+    printf("Account created successfully!\n");
+}
+
+void viewAccount(FILE *fp) {
+    int accNum;
+    struct Account acc;
+    int found = 0;
+
+    printf("Enter account number to view: ");
+    scanf("%d", &accNum);
+
+    rewind(fp);
+    while (fread(&acc, sizeof(acc), 1, fp)) {
+        if (acc.accountNumber == accNum) {
+            printf("\nAccount No: %d\nName: %s\nBalance: %.2f\n", acc.accountNumber, acc.name, acc.balance);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Account not found!\n");
+    }
+}
+
+void deposit(FILE *fp) {
+    int accNum;
+    float amount;
+    struct Account acc;
+    int found = 0;
+
+    printf("Enter account number to deposit into: ");
+    scanf("%d", &accNum);
+
+    rewind(fp);
+    long pos;
+    while ((pos = ftell(fp)), fread(&acc, sizeof(acc), 1, fp)) {
+        if (acc.accountNumber == accNum) {
+            printf("Enter amount to deposit: ");
+            scanf("%f", &amount);
+            acc.balance += amount;
+            fseek(fp, pos, SEEK_SET);
+            fwrite(&acc, sizeof(acc), 1, fp);
+            printf("Deposit successful! New balance: %.2f\n", acc.balance);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Account not found!\n");
+    }
+}
+
+void withdraw(FILE *fp) {
+    int accNum;
+    float amount;
+    struct Account acc;
+    int found = 0;
+
+    printf("Enter account number to withdraw from: ");
+    scanf("%d", &accNum);
+
+    rewind(fp);
+    long pos;
+    while ((pos = ftell(fp)), fread(&acc, sizeof(acc), 1, fp)) {
+        if (acc.accountNumber == accNum) {
+            printf("Enter amount to withdraw: ");
+            scanf("%f", &amount);
+            if (acc.balance >= amount) {
+                acc.balance -= amount;
+                fseek(fp, pos, SEEK_SET);
+                fwrite(&acc, sizeof(acc), 1, fp);
+                printf("Withdrawal successful! New balance: %.2f\n", acc.balance);
+            } else {
+                printf("Insufficient balance!\n");
+            }
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Account not found!\n");
+    }
+}
+
+int main() {
+    FILE *fp = fopen("bank.dat", "rb+");
+    if (!fp) {
+        fp = fopen("bank.dat", "wb+");
+        if (!fp) {
+            printf("Error opening file!\n");
+            return 1;
+        }
+    }
+
+    int choice;
+    do {
+        printf("\n--- Banking System Menu ---\n");
+        printf("1. Create Account\n");
+        printf("2. View Account\n");
+        printf("3. Deposit\n");
+        printf("4. Withdraw\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: createAccount(fp); break;
+            case 2: viewAccount(fp); break;
+            case 3: deposit(fp); break;
+            case 4: withdraw(fp); break;
+            case 5: printf("Exiting...\n"); break;
+            default: printf("Invalid choice!\n");
+        }
+    } while (choice != 5);
+
+    fclose(fp);
+    return 0;
+}
