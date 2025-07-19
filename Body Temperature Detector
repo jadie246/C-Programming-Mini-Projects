@@ -1,0 +1,26 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <windows.h>
+
+void Temperature_checking (float temperature){
+	if (temperature>37.5){
+		printf ("FEVER WARNING!!!: %.2f degree\n", temperature);
+	}
+}
+
+float generateSensorData(float max, float min){
+	float data= min+ ((float)rand()/RAND_MAX)* (max-min);
+	return data;
+}
+
+int main(){
+	srand(time(NULL));
+	while (1){
+	float body_temperature= generateSensorData (0.00, 100.00);
+	Temperature_checking (body_temperature);
+	Sleep(3000);
+}
+    return 0; 
+}
