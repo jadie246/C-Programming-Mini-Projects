@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+int main() {
+    int n;  // number of subjects
+    float grade_point, credit, total_points = 0, total_credits = 0;
+
+    printf("Enter the number of subjects: ");
+    scanf("%d", &n);
+
+    for (int i = 1; i <= n; i++) {
+        printf("Subject %d:\n", i);
+        printf("  Enter grade point (e.g., 4.0, 3.7, etc.): ");
+        scanf("%f", &grade_point);
+
+        printf("  Enter credit hours: ");
+        scanf("%f", &credit);
+
+        total_points += grade_point * credit;
+        total_credits += credit;
+    }
+
+    if (total_credits == 0) {
+        printf("Error: Total credits cannot be zero.\n");
+    } else {
+        float cgpa = total_points / total_credits;
+        printf("\nYour CGPA is: %.2f\n", cgpa);
+    }
+
+    return 0;
+}
